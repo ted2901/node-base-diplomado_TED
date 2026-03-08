@@ -15,14 +15,14 @@ async function create(req, res) {
         return res.json(newTask);
     } catch (error) {
         logger.error(error);
-        return res.json(error.message)
+        return res.status(500).json({ message: error.message })
     }
 }
 
 
 async function get(req, res) {
     const { userId } = req.user;
-    const { page = 1, limit = 10, search = '', orderBy = 'id', orderDir = 'DESC' } = req.query;
+    const { page = 1, limit = 10, search = '', orderby = 'id', orderDir = 'DESC' } = req.query;
 
     try {
         const offset = (parseInt(page) - 1) * parseInt(limit);
@@ -36,7 +36,7 @@ async function get(req, res) {
 
         const { count, rows } = await Task.findAndCountAll({
             attributes: ['id', 'name', 'done'],
-            order: [[orderBy, orderDir]],
+            order: [[orderby, orderDir]],
             where,
             limit: parseInt(limit),
             offset: parseInt(offset)
@@ -69,7 +69,7 @@ async function find(req, res) {
         res.json(task);
     } catch (error) {
         logger.error(error)
-        return res.json(error.message)
+        return res.status(500).json({ message: error.message })
     }
 }
 
@@ -93,7 +93,7 @@ const update = async (req, res) => {
         return res.json(task);
     } catch (error) {
         logger.error(error)
-        return res.json(error.message)
+        return res.status(500).json({ message: error.message })
     }
 }
 
@@ -116,7 +116,7 @@ const done = async (req, res) => {
         return res.json(task);
     } catch (error) {
         logger.error(error)
-        return res.json(error.message)
+        return res.status(500).json({ message: error.message })
     }
 }
 
@@ -136,7 +136,7 @@ const eliminar = async (req, res) => {
 
     } catch (error) {
         logger.error(error)
-        return res.json(error.message)
+        return res.status(500).json({ message: error.message })
     }
 }
 

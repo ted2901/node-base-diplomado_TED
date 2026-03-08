@@ -17,5 +17,4 @@ app.use('/api/tasks/', tasksRoutes)
 app.use('/api/login', authRoutes)
 app.use(authenticateToken)
 
-
 export default app;

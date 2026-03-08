@@ -17,9 +17,9 @@ async function create(req, res) {
     return res.json(newUser)
   } catch (error) {
     logger.error(error)
-    return res.json(error.message)
+    return res.status(500).json({ message: error.message })
   }
-};
+}
 
 
 
@@ -27,7 +27,7 @@ async function create(req, res) {
 async function get(req, res) {
   try {
     const users = await User.findAndCountAll({
-      attributes: ['id', 'username', 'password', 'status'],
+      attributes: ['id', 'username', 'status'],
       order: [['id', 'DESC']],
       where: {
         status: Status.ACTIVE
@@ -39,7 +39,7 @@ async function get(req, res) {
     })
   } catch (error) {
     logger.error(error)
-    return res.json(error.message)
+    return res.status(500).json({ message: error.message })
   }
 } // <- Cerramos la funcion get
 
@@ -57,7 +57,7 @@ async function find(req, res) {
     res.json(user);
   } catch (error) {
     logger.error(error)
-    return res.json(error.message)
+    return res.status(500).json({ message: error.message })
   }
 }
 
@@ -77,7 +77,7 @@ const update = async (req, res) => {
     return res.json(user);
   } catch (error) {
     logger.error(error)
-    return res.json(error.message)
+    return res.status(500).json({ message: error.message })
   }
 }
 
@@ -104,9 +104,9 @@ const activateInactivate = async (req, res) => {
     res.json(user);
   } catch (error) {
     logger.error(error)
-    return res.json(error.message)
+    return res.status(500).json({ message: error.message })
   }
-};
+}
 
 
 
@@ -122,26 +122,31 @@ const eliminar = async (req, res) => {
 
   } catch (error) {
     logger.error(error)
-    return res.json(error.message)
+    return res.status(500).json({ message: error.message })
   }
 }
 
 async function getUsersPagination(req, res) {
-  const { page = 1, limit = 10, search = '', orderBy = 'id', orderDir = 'DESC' } = req.query;
+  const { page = 1, limit = 10, search = '', orderby = 'id', orderDir = 'DESC', status = 'active' } = req.query;
 
   try {
     const offset = (parseInt(page) - 1) * parseInt(limit);
     const where = {};
+
     if (search) {
       where.username = {
         [Op.iLike]: `%${search}%`
       };
     }
 
+    if (status) {
+      where.status = status.toUpperCase() === 'ACTIVE' ? Status.ACTIVE : Status.INACTIVE;
+    }
+
     const { count, rows } = await User.findAndCountAll({
       attributes: ['id', 'username', 'status'],
       where,
-      order: [[orderBy, orderDir]],
+      order: [[orderby, orderDir]],
       limit: parseInt(limit),
       offset: parseInt(offset)
     });
