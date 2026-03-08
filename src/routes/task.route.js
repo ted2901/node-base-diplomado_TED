@@ -1,18 +1,19 @@
 import { Router } from "express";
 import taskController from "../controllers/task.controller.js";
+import authenticateToken from "../middlewares/authenticate.middleware.js";
 
 const router = Router()
 
 router
     .route('/')
-    .get(taskController.get)
-    .post(taskController.create);
+    .get(authenticateToken, taskController.get)
+    .post(authenticateToken, taskController.create);
 
 router
     .route('/:id')
-    .get(taskController.find)
-    .put(taskController.update)
-    .delete(taskController.eliminar)
-    .patch(taskController.done);
+    .get(authenticateToken, taskController.find)
+    .put(authenticateToken, taskController.update)
+    .delete(authenticateToken, taskController.eliminar)
+    .patch(authenticateToken, taskController.done);
 
 export default router;

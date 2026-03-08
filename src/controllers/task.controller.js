@@ -1,4 +1,6 @@
 import { Task } from '../models/task.js';
+import { Op } from 'sequelize';
+import logger from '../logs/logger.js';
 
 async function create(req, res) {
     const { name } = req.body;
@@ -20,21 +22,33 @@ async function create(req, res) {
 
 async function get(req, res) {
     const { userId } = req.user;
+    const { page = 1, limit = 10, search = '', orderBy = 'id', orderDir = 'DESC' } = req.query;
+
     try {
-        const task = await task.findaAndCountAll({
+        const offset = (parseInt(page) - 1) * parseInt(limit);
+        const where = { userId };
+
+        if (search) {
+            where.name = {
+                [Op.iLike]: `%${search}%`
+            };
+        }
+
+        const { count, rows } = await Task.findAndCountAll({
             attributes: ['id', 'name', 'done'],
-            order: [['id', 'DESC']],
-            where: {
-                userId
-            },
+            order: [[orderBy, orderDir]],
+            where,
+            limit: parseInt(limit),
+            offset: parseInt(offset)
         });
+
         res.json({
-            total: tasks.count,
-            data: tasks.rows,
+            total: count,
+            data: rows,
         });
     } catch (error) {
         logger.error(error);
-        return res.json(error.message)
+        return res.status(500).json({ message: error.message })
     }
 }
 

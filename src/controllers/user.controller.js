@@ -160,6 +160,31 @@ async function getUsersPagination(req, res) {
   }
 }
 
+async function getTasksByUserId(req, res) {
+  const { id } = req.params;
+  try {
+    const userWithTasks = await User.findOne({
+      attributes: ['username'],
+      where: { id },
+      include: [
+        {
+          model: Task,
+          attributes: ['name', 'done']
+        }
+      ]
+    });
+
+    if (!userWithTasks) {
+      return res.status(404).json({ message: 'usuario no encontrado' });
+    }
+
+    res.json(userWithTasks);
+  } catch (error) {
+    logger.error(error);
+    return res.status(500).json({ message: error.message });
+  }
+}
+
 export default {
   create,
   get,
@@ -168,4 +193,5 @@ export default {
   eliminar,
   activateInactivate,
   getUsersPagination,
+  getTasksByUserId,
 }
