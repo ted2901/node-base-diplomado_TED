@@ -10,10 +10,7 @@ export const sequelize = new Sequelize(
         dialect: env.db_dialect,
         logging: console.log,
         dialectOptions: env.db_use_ssl ? {
-            ssl: {
-                require: true,
-                rejectUnauthorized: false
-            }
+
         } : {}
     }
 );
